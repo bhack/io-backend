@@ -60,7 +60,7 @@ export default class PagoPAController {
       // the email from the SPID profile
       const email = maybeCustomEmail ? maybeCustomEmail : profile.spid_email;
 
-      if (!email) {
+      if (!email || !user.spid_mobile_phone) {
         return ResponseErrorValidation(
           "Validation Error",
           "Missing User Email"
@@ -74,6 +74,11 @@ export default class PagoPAController {
         name: user.name
       };
 
-      return ResponseSuccessJson(pagopaUser);
+      return PagoPAUser.decode(pagopaUser).fold<
+        IResponseErrorValidation | IResponseSuccessJson<PagoPAUser>
+      >(
+        _ => ResponseErrorValidation("Bad Request", "Invalid User Profile"),
+        _ => ResponseSuccessJson(_)
+      );
     });
 }
