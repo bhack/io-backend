@@ -410,56 +410,46 @@ describe("RedisSessionStorage#getBySessionToken", () => {
 
 // tslint:disable-next-line: no-big-function
 describe("RedisSessionStorage#del", () => {
+  const expectedRedisDelSessionError = new Error("del error");
+  const expectedRedisDelWalletError = new Error("hdel error");
+
   it.each([
-    [undefined, 2, undefined, 1, right(true), "should delete a session"],
+    [undefined, 1, undefined, 1, right(true), "should delete a session"],
     [
-      new Error("del error"),
+      expectedRedisDelSessionError,
       undefined,
       undefined,
       1,
       left(
         multipleErrorsFormatter(
-          [
-            new Error(
-              "Unexpected response from redis client deleting sessionInfoKey and sessionToken."
-            )
-          ],
+          [expectedRedisDelSessionError],
           "RedisSessionStorage.del"
         )
       ),
       "should fail if Redis client returns an error deleting the session"
     ],
     [
-      new Error("del error"),
+      expectedRedisDelSessionError,
       undefined,
-      new Error("hdel error"),
+      expectedRedisDelWalletError,
       undefined,
       left(
         multipleErrorsFormatter(
-          [
-            new Error(
-              "Unexpected response from redis client deleting sessionInfoKey and sessionToken."
-            ),
-            new Error(
-              "Unexpected response from redis client deleting walletToken."
-            )
-          ],
+          [expectedRedisDelSessionError, expectedRedisDelWalletError],
           "RedisSessionStorage.del"
         )
       ),
       "should fail if Redis client returns an error deleting the session and an error deleting the mapping"
     ],
     [
-      new Error("del error"),
+      expectedRedisDelSessionError,
       undefined,
       undefined,
       undefined,
       left(
         multipleErrorsFormatter(
           [
-            new Error(
-              "Unexpected response from redis client deleting sessionInfoKey and sessionToken."
-            ),
+            expectedRedisDelSessionError,
             new Error(
               "Unexpected response from redis client deleting walletToken."
             )
@@ -489,7 +479,7 @@ describe("RedisSessionStorage#del", () => {
     [
       undefined,
       undefined,
-      new Error("hdel error"),
+      expectedRedisDelWalletError,
       undefined,
       left(
         multipleErrorsFormatter(
@@ -497,9 +487,7 @@ describe("RedisSessionStorage#del", () => {
             new Error(
               "Unexpected response from redis client deleting sessionInfoKey and sessionToken."
             ),
-            new Error(
-              "Unexpected response from redis client deleting walletToken."
-            )
+            expectedRedisDelWalletError
           ],
           "RedisSessionStorage.del"
         )
@@ -528,16 +516,12 @@ describe("RedisSessionStorage#del", () => {
     ],
     [
       undefined,
-      2,
-      new Error("hdel error"),
+      1,
+      expectedRedisDelWalletError,
       undefined,
       left(
         multipleErrorsFormatter(
-          [
-            new Error(
-              "Unexpected response from redis client deleting walletToken."
-            )
-          ],
+          [expectedRedisDelWalletError],
           "RedisSessionStorage.del"
         )
       ),
@@ -546,7 +530,7 @@ describe("RedisSessionStorage#del", () => {
     [
       undefined,
       undefined,
-      new Error("hdel error"),
+      expectedRedisDelWalletError,
       undefined,
       left(
         multipleErrorsFormatter(
@@ -554,9 +538,7 @@ describe("RedisSessionStorage#del", () => {
             new Error(
               "Unexpected response from redis client deleting sessionInfoKey and sessionToken."
             ),
-            new Error(
-              "Unexpected response from redis client deleting walletToken."
-            )
+            expectedRedisDelWalletError
           ],
           "RedisSessionStorage.del"
         )
@@ -565,7 +547,7 @@ describe("RedisSessionStorage#del", () => {
     ],
     [
       undefined,
-      2,
+      1,
       undefined,
       undefined,
       left(
@@ -581,16 +563,14 @@ describe("RedisSessionStorage#del", () => {
       "should fail if Redis client returns false on deleting the mapping"
     ],
     [
-      new Error("del error"),
+      expectedRedisDelSessionError,
       undefined,
       undefined,
       undefined,
       left(
         multipleErrorsFormatter(
           [
-            new Error(
-              "Unexpected response from redis client deleting sessionInfoKey and sessionToken."
-            ),
+            expectedRedisDelSessionError,
             new Error(
               "Unexpected response from redis client deleting walletToken."
             )
