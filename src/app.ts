@@ -563,6 +563,7 @@ function registerAPIRoutes(
   );
 }
 
+// tslint:disable-next-line: parameters-max-number
 function registerAuthenticationRoutes(
   app: Express,
   basePath: string,
