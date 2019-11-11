@@ -232,6 +232,9 @@ export async function newApp(
     // Ceate the Token Service
     const TOKEN_SERVICE = new TokenService();
 
+    // Create the profile service
+    const PROFILE_SERVICE = new ProfileService(API_CLIENT);
+
     registerAuthenticationRoutes(
       app,
       authenticationBasePath,
@@ -239,7 +242,8 @@ export async function newApp(
       SAML_CERT,
       TOKEN_SERVICE,
       defaultModule.currentSpidStrategy,
-      getClientProfileRedirectionUrl
+      getClientProfileRedirectionUrl,
+      PROFILE_SERVICE
     );
 
     // Create the Notification Service
@@ -247,8 +251,6 @@ export async function newApp(
       hubName,
       endpointOrConnectionString
     );
-    // Create the profile service
-    const PROFILE_SERVICE = new ProfileService(API_CLIENT);
     // Create the messages service.
     const MESSAGES_SERVICE = new MessagesService(API_CLIENT);
     const PAGOPA_PROXY_SERVICE = new PagoPAProxyService(PAGOPA_CLIENT);
@@ -568,7 +570,8 @@ function registerAuthenticationRoutes(
   samlCert: string,
   tokenService: TokenService,
   spidStrategy: SpidStrategy,
-  getRedirectionUrl: (token: string) => UrlFromString
+  getRedirectionUrl: (token: string) => UrlFromString,
+  profileService: ProfileService
 ): void {
   const bearerTokenAuth = passport.authenticate("bearer", { session: false });
 
@@ -577,7 +580,8 @@ function registerAuthenticationRoutes(
     samlCert,
     spidStrategy,
     tokenService,
-    getRedirectionUrl
+    getRedirectionUrl,
+    profileService
   );
 
   app.post(
